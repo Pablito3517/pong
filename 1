@@ -1,0 +1,131 @@
+let ball;
+let paddle1;
+let paddle2;
+let ballSpeedX = 5;
+let ballSpeedY = 3;
+let paddleSpeed = 10;
+let paddleHeight = 80;  // Mayor tamaño para las palas
+let leftScore = 0;      // Puntuación jugador izquierdo
+let rightScore = 0;     // Puntuación jugador derecho
+let leftPoints = 0;     // Contador de tantos para el jugador izquierdo
+let rightPoints = 0;    // Contador de tantos para el jugador derecho
+let scoreFont;          // Fuente para el marcador
+let paddle1Color;       // Color de la paleta izquierda
+let paddle2Color;       // Color de la paleta derecha
+
+function setup() {
+  createCanvas(800, 600);
+  ball = createVector(width / 2, height / 2);
+  paddle1 = createVector(10, height / 2 - paddleHeight / 2);  // Paleta 1 (izquierda)
+  paddle2 = createVector(width - 20, height / 2 - paddleHeight / 2);  // Paleta 2 (derecha)
+  scoreFont = loadFont('https://cdnjs.cloudflare.com/ajax/libs/primeicons/6.0.0/fonts/primeicons.ttf');
+  
+  // Inicializar el color de las palas
+  paddle1Color = color(255, 0, 0);  // Rojo para la paleta izquierda
+  paddle2Color = color(0, 0, 255);  // Azul para la paleta derecha
+}
+
+function draw() {
+  background(0);  // Fondo negro
+  
+  // Dibujar la línea central
+  stroke(255);
+  strokeWeight(2);
+  line(width / 2, 0, width / 2, height);  // Línea vertical en el medio
+  
+  // Mover la bola
+  ball.x += ballSpeedX;
+  ball.y += ballSpeedY;
+  
+  // Colisiones con las paredes superior e inferior
+  if (ball.y <= 0 || ball.y >= height) {
+    ballSpeedY *= -1;  // Rebotar la bola al chocar con las paredes superior e inferior
+  }
+  
+  // Colisiones con las palas
+  if (ball.x <= paddle1.x + 10 && ball.y >= paddle1.y && ball.y <= paddle1.y + paddleHeight) {
+    ballSpeedX *= -1;  // Rebotar la bola al chocar con la paleta izquierda
+  }
+  
+  if (ball.x >= paddle2.x - 10 && ball.y >= paddle2.y && ball.y <= paddle2.y + paddleHeight) {
+    ballSpeedX *= -1;  // Rebotar la bola al chocar con la paleta derecha
+  }
+  
+  // Bola fuera de los límites (puntos)
+  if (ball.x <= 0) {  // Puntuación para el jugador derecho
+    rightPoints++;
+    rightScore++;
+    resetBall();  // Reiniciar la bola
+    changePaddleColor();  // Cambiar el color de las palas después de un tanto
+  }
+  
+  if (ball.x >= width) {  // Puntuación para el jugador izquierdo
+    leftPoints++;
+    leftScore++;
+    resetBall();  // Reiniciar la bola
+    changePaddleColor();  // Cambiar el color de las palas después de un tanto
+  }
+  
+  // Movimiento de las palas
+  if (keyIsDown(UP_ARROW)) {
+    paddle2.y -= paddleSpeed;  // Mover paleta derecha hacia arriba
+  }
+  
+  if (keyIsDown(DOWN_ARROW)) {
+    paddle2.y += paddleSpeed;  // Mover paleta derecha hacia abajo
+  }
+  
+  // Movimiento de la paleta izquierda (usando las teclas W y S)
+  if (keyIsDown(87)) {  // W
+    paddle1.y -= paddleSpeed;  // Mover paleta izquierda hacia arriba
+  }
+  
+  if (keyIsDown(83)) {  // S
+    paddle1.y += paddleSpeed;  // Mover paleta izquierda hacia abajo
+  }
+
+  // Limitar el movimiento de las palas dentro de los límites
+  paddle1.y = constrain(paddle1.y, 0, height - paddleHeight);  // Paleta izquierda
+  paddle2.y = constrain(paddle2.y, 0, height - paddleHeight);  // Paleta derecha
+  
+  // Dibujar la bola
+  fill(255);
+  ellipse(ball.x, ball.y, 20, 20);  // Bola con tamaño fijo
+  
+  // Dibujar las palas con los colores actuales
+  fill(paddle1Color);
+  rect(paddle1.x, paddle1.y, 10, paddleHeight);  // Paleta izquierda
+  fill(paddle2Color);
+  rect(paddle2.x, paddle2.y, 10, paddleHeight);  // Paleta derecha
+  
+  // Mostrar el marcador
+  textSize(32);
+  textFont(scoreFont);
+  fill(255);
+  textAlign(CENTER, TOP);  // Centrar el texto
+  text(leftScore, width / 4, 20);  // Puntuación izquierda
+  text(rightScore, 3 * width / 4, 20);  // Puntuación derecha
+  
+  // Mostrar el contador de tantos
+  textSize(20);
+  textAlign(LEFT, TOP);  // Alineación para los tantos
+  text("Tantos Jugador Izq: " + leftPoints, 20, 60);  // Contador de tantos jugador izquierdo
+  text("Tantos Jugador Der: " + rightPoints, width - 220, 60);  // Contador de tantos jugador derecho
+}
+
+// Función para reiniciar la bola
+function resetBall() {
+  ball.x = width / 2;
+  ball.y = height / 2;
+  ballSpeedX = random(1) > 0.5 ? 5 : -5;  // Reiniciar la bola con velocidad aleatoria
+  ballSpeedY = random(1) > 0.5 ? 3 : -3;  // Dirección aleatoria en el eje Y
+}
+
+// Función para cambiar el color de las palas
+function changePaddleColor() {
+  // Cambiar el color de las palas a colores aleatorios
+  paddle1Color = color(random(255), random(255), random(255));
+  paddle2Color = color(random(255), random(255), random(255));
+}
+
+
